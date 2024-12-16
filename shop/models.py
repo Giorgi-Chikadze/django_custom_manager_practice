@@ -1,6 +1,21 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.db.models import Count
+
+class CategoryManager(models.Manager):
+    def with_item_count(self):
+        return self.get_queryset().annotate(items_count=Count('items'))
+
+class ItemManager(models.Manager):
+    def with_tag_count(self):
+        return self.get_queryset().annotate(tags_count=Count("tags"))
+    
+
+class TagManager(models.Manager):
+    def popular_tags(self, min_items):
+        return self.get_queryset().annotate(items_count=Count("items")).filter(items_count__gte=min_items)
+
 
 
 class Category(models.Model):
